@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn add:*)",
+      "Bash(source ~/.nvm/nvm.sh)",
+      "Bash(nvm ls:*)",
+      "Bash(nvm use:*)",
+      "Bash(nvm install:*)",
+      "Bash(yarn remove:*)",
+      "Bash(npx tsc:*)",
+      "Bash(yarn next:*)",
+      "Bash(yarn build:*)",
+      "Bash(yarn tsc:*)",
+      "Bash(kill:*)"
+    ]
+  }
+}

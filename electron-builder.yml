@@ -1,0 +1,30 @@
+appId: com.clarify.app
+productName: Clarify
+directories:
+  output: release
+  buildResources: public
+files:
+  - electron/dist/**/*
+  - out/**/*
+  - package.json
+  - node_modules/dotenv/**/*
+  - node_modules/electron-updater/**/*
+asar: true
+publish:
+  provider: github
+  owner: Zeyu-Li
+  repo: clarify
+mac:
+  target:
+    - dmg
+    - zip
+win:
+  target: nsis
+nsis:
+  oneClick: true
+  perMachine: false
+  allowToChangeInstallationDirectory: false
+linux:
+  target:
+    - AppImage
+    - deb

@@ -13,7 +13,7 @@ asar: true
 publish:
   provider: github
   owner: Zeyu-Li
-  repo: clarify
+  repo: patched-clarify
 mac:
   target:
     - dmg

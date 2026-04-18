@@ -1,9 +1,22 @@
 import Head from "next/head";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Upload, Download, ArrowLeftRight, ImagePlus } from "lucide-react";
 import Upscaler from "upscaler";
-import model from "@upscalerjs/esrgan-medium/2x";
+import model2x from "@upscalerjs/esrgan-medium/2x";
+import model3x from "@upscalerjs/esrgan-medium/3x";
+import model4x from "@upscalerjs/esrgan-medium/4x";
+import model8x from "@upscalerjs/esrgan-medium/8x";
 import { Button, buttonVariants } from "~/components/ui/button";
+
+const SCALE_OPTIONS = [2, 3, 4, 8] as const;
+type Scale = (typeof SCALE_OPTIONS)[number];
+
+const models: Record<Scale, typeof model2x> = {
+  2: model2x,
+  3: model3x,
+  4: model4x,
+  8: model8x,
+};
 
 export default function Home() {
   const [upscaledFile, setUpscaledFile] = useState("");
@@ -16,16 +29,9 @@ export default function Home() {
   } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState("");
+  const [scale, setScale] = useState<Scale>(2);
 
-  const upscalerRef = useRef<InstanceType<typeof Upscaler> | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    upscalerRef.current = new Upscaler({ model });
-    return () => {
-      upscalerRef.current?.dispose();
-    };
-  }, []);
 
   const upscaleFromFile = async (file: File) => {
     const localUrl = URL.createObjectURL(file);
@@ -33,6 +39,7 @@ export default function Home() {
     setIsLoading(true);
     setError("");
 
+    let upscaler: InstanceType<typeof Upscaler> | null = null;
     try {
       const img = new Image();
       img.src = localUrl;
@@ -41,7 +48,8 @@ export default function Home() {
         img.onerror = () => reject(new Error("Failed to load image"));
       });
 
-      const upscaledBase64 = await upscalerRef.current!.upscale(img, {
+      upscaler = new Upscaler({ model: models[scale] });
+      const upscaledBase64 = await upscaler.upscale(img, {
         patchSize: 512,
         padding: 4,
       });
@@ -50,6 +58,7 @@ export default function Home() {
       console.error("Upscale failed:", err);
       setError(err instanceof Error ? err.message : "Upscaling failed");
     } finally {
+      upscaler?.dispose();
       setIsLoading(false);
     }
   };
@@ -101,37 +110,73 @@ export default function Home() {
           </h1>
 
           {!upscaledFile && !isLoading && (
-            <div
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onClick={() => fileInputRef.current?.click()}
-              className={`flex w-full max-w-2xl cursor-pointer flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-16 transition ${
-                isDragging
-                  ? "border-teal-400 bg-teal-400/10"
-                  : "border-slate-600 bg-slate-800/50 hover:border-slate-500 hover:bg-slate-800"
-              }`}
-            >
-              <Upload className="h-12 w-12 text-slate-400" />
-              <p className="text-lg text-slate-300">
-                Drag and drop an image, or click to browse
-              </p>
-              <p className="text-sm text-slate-500">
-                PNG, JPG, WebP supported
-              </p>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="hidden"
-              />
-            </div>
+            <>
+              <div className="flex w-full max-w-2xl flex-col items-center gap-4">
+                <label className="text-sm font-medium text-slate-400">
+                  Scale Factor
+                </label>
+                <div className="flex w-full max-w-sm flex-col items-center gap-2">
+                  <input
+                    type="range"
+                    min={0}
+                    max={SCALE_OPTIONS.length - 1}
+                    step={1}
+                    value={SCALE_OPTIONS.indexOf(scale)}
+                    onChange={(e) =>
+                      setScale(SCALE_OPTIONS[Number(e.target.value)]!)
+                    }
+                    className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-700 accent-teal-500"
+                  />
+                  <div className="flex w-full justify-between px-1">
+                    {SCALE_OPTIONS.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setScale(s)}
+                        className={`text-sm font-medium transition ${
+                          scale === s
+                            ? "text-teal-400"
+                            : "text-slate-500 hover:text-slate-300"
+                        }`}
+                      >
+                        {s}x
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onClick={() => fileInputRef.current?.click()}
+                className={`flex w-full max-w-2xl cursor-pointer flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed p-16 transition ${
+                  isDragging
+                    ? "border-teal-400 bg-teal-400/10"
+                    : "border-slate-600 bg-slate-800/50 hover:border-slate-500 hover:bg-slate-800"
+                }`}
+              >
+                <Upload className="h-12 w-12 text-slate-400" />
+                <p className="text-lg text-slate-300">
+                  Drag and drop an image, or click to browse
+                </p>
+                <p className="text-sm text-slate-500">
+                  PNG, JPG, WebP supported
+                </p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+              </div>
+            </>
           )}
 
           {isLoading && (
             <h2 className="m-4 text-center text-2xl text-slate-300">
-              Upscaling image...
+              Upscaling image ({scale}x)...
             </h2>
           )}
 

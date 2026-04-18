@@ -1,6 +1,4 @@
-interface ElectronAPI {
-  upscaleImage: (fileUrl: string) => Promise<{ upscaledUrl: string }>;
-}
+interface ElectronAPI {}
 
 interface Window {
   electronAPI?: ElectronAPI;

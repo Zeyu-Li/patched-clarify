@@ -11,7 +11,22 @@
       "Bash(yarn next:*)",
       "Bash(yarn build:*)",
       "Bash(yarn tsc:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(yarn package:*)",
+      "Bash(mkdir -p /tmp/clarify-icon.iconset)",
+      "Bash(sips -z 1024 1024 /Users/ali04/Downloads/_memes/main3.png --out /tmp/clarify-icon-1024.png)",
+      "Read(//private/tmp/clarify-icon.iconset/**)",
+      "Bash(cp icon_32x32.png icon_16x16@2x.png)",
+      "Bash(cp icon_64x64.png icon_32x32@2x.png)",
+      "Bash(cp icon_256x256.png icon_128x128@2x.png)",
+      "Bash(cp icon_512x512.png icon_256x256@2x.png)",
+      "Bash(iconutil:*)",
+      "Bash(cp /tmp/clarify-icon-1024.png /Users/ali04/Documents/GitHub/clarify/.claude/worktrees/elegant-gliding-metcalfe/public/icon.png)",
+      "Bash(sips -s format ico /tmp/clarify-icon.iconset/icon_256x256.png --out /Users/ali04/Documents/GitHub/clarify/.claude/worktrees/elegant-gliding-metcalfe/public/icon.ico)",
+      "Bash(npx asar:*)"
     ]
   }
 }

@@ -1,6 +1,3 @@
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge } from "electron";
 
-contextBridge.exposeInMainWorld("electronAPI", {
-  upscaleImage: (fileUrl: string) =>
-    ipcRenderer.invoke("upscale-image", fileUrl),
-});
+contextBridge.exposeInMainWorld("electronAPI", {});
